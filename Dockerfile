@@ -8,6 +8,7 @@ WORKDIR /build
 COPY .mvn /build/.mvn/
 COPY mvnw pom.xml /build/
 COPY src /build/src
+RUN java -version
 RUN ./mvnw -B package
 
 # Build runtime image
