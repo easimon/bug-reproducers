@@ -1,18 +1,23 @@
-name: JDK compatibility tests (Build)
+name: JDK compatibility tests (Runtime)
 
 on:
   push:
 
 jobs:
   test:
-    name: "Build ${{ matrix.platform }}: ${{ matrix.build-image }}"
+    name: "Build ${{ matrix.platform }}: ${{ matrix.build-image }}/${{ matrix.runtime-image }}"
     runs-on: ubuntu-22.04
     strategy:
       matrix:
         build-image:
-          - eclipse-temurin:11
-          - eclipse-temurin:17
-          - eclipse-temurin:18
+          - 11
+        runtime-image:
+          - 11
+          - 11-jre
+          - 17
+          - 17-jre
+          - 18
+          - 18-jre
         platform:
           - linux/amd64
           - linux/arm64/v8
@@ -35,6 +40,15 @@ jobs:
       - name: "Build the Docker Image"
         run: |
           docker build \
-            --build-arg BUILD_IMAGE=${{ matrix.build-image }} \
+            --build-arg BUILD_IMAGE=eclipse-temurin:${{ matrix.build-image }} \
+            --build-arg RUNTIME_IMAGE=eclipse-temurin:${{ matrix.runtime-image }} \
             --platform ${{ matrix.platform }} \
+            --tag test:latest \
+            --load \
             .
+
+      - name: "Execute the Docker Image"
+        run: |
+          docker run \
+          --platform ${{ matrix.platform }} \
+          test:latest
