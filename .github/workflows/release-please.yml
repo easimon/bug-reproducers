@@ -1,0 +1,23 @@
+name: Release Please
+on:
+  push:
+
+jobs:
+  release-please:
+    runs-on: ubuntu-22.04
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+    steps:
+      - uses: GoogleCloudPlatform/release-please-action@v3.5.0
+        id: release
+        with:
+          package-name: release-please-test
+          release-type: simple
+
+  release-please-output:
+    runs-on: ubuntu-22.04
+    needs:
+      - release-please
+    steps:
+      - run: echo ${{ needs.release-please.outputs.release_created }}
+
